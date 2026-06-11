@@ -1,0 +1,29 @@
+# === Firmware propietario de Xiaomi — NUNCA se versiona ===
+# Blobs del modem / WiFi extraídos del dispositivo
+*.mbn
+*.mdt
+*.b[0-9]*
+board-2.bin
+firmware-5.bin
+*.tar.gz
+*.zip
+
+# === Artefactos de build ===
+*.apk
+*.img
+*.o
+*.ko
+*.ko.zst
+
+# === Árboles fuente externos clonados (kernel/qcacld/installers) ===
+# Repos de terceros con su propia historia git; se clonan/descargan aparte
+xiaomi-downstream-kernel/
+android_kernel_*/
+qcacld*/
+*.AppImage
+squashfs-root/
+
+# === Temporales ===
+*.swp
+*~
+.DS_Store

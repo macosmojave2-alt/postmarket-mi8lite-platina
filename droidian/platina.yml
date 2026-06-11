@@ -1,0 +1,87 @@
+name: "Xiaomi Mi 8 Lite"
+codename: "platina"
+formfactor: "phone"
+aliases: []
+doppelgangers: []
+user_actions:
+  bootloader:
+    title: "Reboot to Bootloader"
+    description: "With the device powered off, hold Volume Down + Power."
+    image: "phone_power_down"
+    button: true
+  boot:
+    title: "Boot the device"
+    description: "Power on the device."
+    image: "phone_power_up"
+    button: true
+  confirm_model:
+    title: "Confirm your model"
+    description: "Please double-check that your device is a Xiaomi Mi 8 Lite (platina)."
+  unlock:
+    title: "OEM unlock"
+    description: "If you haven't done so already, make sure to OEM unlock your device first."
+    link: "https://en.miui.com/unlock/"
+unlock:
+  - "confirm_model"
+  - "unlock"
+handlers:
+  bootloader_locked:
+    actions:
+      - fastboot:oem_unlock:
+operating_systems:
+  - name: "Droidian"
+    compatible_installer: ">=0.9.2-beta"
+    options:
+      - var: "variant"
+        name: "Variant"
+        tooltip: "The graphical shell to install"
+        type: "select"
+        values:
+          - value: "phosh"
+            label: "Phosh"
+    prerequisites: []
+    steps:
+      - actions:
+          - core:download:
+              group: "firmware"
+              files:
+                - url: "https://images.droidian.org/droidian/nightly/arm64/xiaomi/image-fastboot-lavender.zip"
+        condition:
+          var: "variant"
+          value: "phosh"
+      - actions:
+          - core:unpack:
+              group: "firmware"
+              files:
+                - archive: "image-fastboot-lavender.zip"
+                  dir: "unpacked_droidian"
+        condition:
+          var: "variant"
+          value: "phosh"
+      - actions:
+          - adb:reboot:
+              to_state: "bootloader"
+        fallback:
+          - core:user_action:
+              action: "bootloader"
+      - actions:
+          - fastboot:flash:
+              partitions:
+                - partition: "boot"
+                  file: "unpacked_droidian/data/boot.img"
+                  group: "firmware"
+                - partition: "userdata"
+                  file: "unpacked_droidian/data/userdata.img"
+                  group: "firmware"
+                - partition: "vendor"
+                  file: "unpacked_droidian/data/vendor.img"
+                  group: "firmware"
+                - partition: "vbmeta"
+                  file: "unpacked_droidian/data/vbmeta.img"
+                  group: "firmware"
+                  flags:
+                    - "--disable-verity"
+                    - "--disable-verification"
+      - actions:
+          - fastboot:reboot:
+    slideshow: []
