@@ -1,5 +1,11 @@
 # Próximos pasos — Port downstream Mi 8 Lite (qcacld) — PROMPT DE CONTINUACIÓN
 
+> ⛔ **OBSOLETO / VÍA ABANDONADA (2026-06-13).** El desarrollo NO continúa por aquí.
+> El WiFi por qcacld/downstream es un callejón sin salida en este SoC (el user PD
+> `wlan_pd` no arranca; mecanismo SDM845+ no soportado por este firmware de modem).
+> Ver **[DECISION-DE-RUMBO.md](DECISION-DE-RUMBO.md)**. Este archivo se conserva solo
+> como registro histórico del diagnóstico.
+
 > Pega este archivo (o léelo) al retomar. Es el punto exacto donde quedó el trabajo.
 
 ## CONTEXTO DE UNA LÍNEA

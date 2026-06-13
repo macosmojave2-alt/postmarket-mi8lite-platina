@@ -1,5 +1,9 @@
 # Mi 8 Lite (xiaomi-platina) — WiFi en postmarketOS mainline
 
+> 📌 **RUMBO DEL PROYECTO:** ver [DECISION-DE-RUMBO.md](DECISION-DE-RUMBO.md) (2026-06-13).
+> Desarrollo sobre **kernel MAINLINE**. Vía downstream (qcacld) **abandonada**.
+> Orden de objetivos: **1º pantalla/UI, 2º WiFi**.
+
 Paquetes para habilitar el WiFi (Qualcomm WCN3990) y el modem (MSS) en el
 Xiaomi Mi 8 Lite (SDM660) con postmarketOS, kernel mainline
 `linux-postmarketos-qcom-sdm660` (6.17.4).
