@@ -1,27 +1,24 @@
 # Reference: <https://postmarketos.org/devicepkg>
+maintainer="Cesar Tamayo <macosmojave2@gmail.com>"
 pkgname=device-xiaomi-platina
 pkgdesc="Xiaomi Mi 8 Lite"
-pkgver=4
-pkgrel=4
+pkgver=5
+pkgrel=7
 url="https://postmarketos.org"
 license="MIT"
 arch="aarch64"
 options="!check !archcheck"
-# soc-qcom-sdm660-rproc aporta rmtfs/tqftpserv: necesarios para que el modem
-# (MSS) y el WiFi (WCN3990) carguen su firmware. El kernel pkgrel>=2 incluye el
-# patch que habilita los nodos &wifi y &remoteproc_mss en el devicetree.
 depends="
-	iw
+	firmware-qcom-adreno-a530
+	firmware-xiaomi-platina
 	linux-postmarketos-qcom-sdm660
 	mkbootimg
+	msm-firmware-loader
 	postmarketos-base
 	soc-qcom-sdm660
-	soc-qcom-sdm660-rproc
-	wpa_supplicant
 	"
 makedepends="devicepkg-dev"
-source="deviceinfo modules-initfs"
-subpackages="$pkgname-nonfree-firmware:nonfree_firmware"
+source="deviceinfo modules-initfs diag-pantalla.sh disable-suspend.start"
 
 build() {
 	devicepkg_build $startdir $pkgname
@@ -29,15 +26,15 @@ build() {
 
 package() {
 	devicepkg_package $startdir $pkgname
-}
-
-nonfree_firmware() {
-	pkgdesc="Wi-Fi/Modem firmware (wlanmdsp.mbn)"
-	depends="firmware-xiaomi-platina"
-	mkdir "$subpkgdir"
+	install -Dm755 "$srcdir/diag-pantalla.sh" \
+		"$pkgdir/usr/bin/diag-pantalla.sh"
+	install -Dm755 "$srcdir/disable-suspend.start" \
+		"$pkgdir/etc/local.d/disable-suspend.start"
 }
 
 sha512sums="
-1b7f3d5ecedc5b78d7b1a94d509f9816c1e408ecdc9a584be6a3b50327177a5cf2844bf7146c9e169faa0f6a6e53cadee93e41d91ab4122a393340f378a3cb77  deviceinfo
+44017a36af89234916cd4aede91b1b3f4985e8e28bbc6f6a2215cd769cb045ec3b337529654f9d7a720842502b52f30caed955be34db6aec6b9d08fea409c131  deviceinfo
 a9eac9527c9561a1f6bd80d3e68116bb6bb780b0cb7db89ddd84aaf42a1afc605fff258aaf1cb589cb003e213c29293216c7e9c06e07fcc9a11fea9ff1c3c7c9  modules-initfs
+7fe9e9dbf86309ff4507e8d8977b166b7b812aa16896e20772461f0d63893de58d039e238d497f900435bff7c5b921ffa8941df3078b6de53ddc9a0c05153eff  diag-pantalla.sh
+53d9813f7537bc7d6f2ff7a623ed36c6f1243f3b66bbbc1ac2ebd55897a638e7867e447bea3b0353500d6b1a9a0142e18c1a708f3ff968f8970beedc1175279a  disable-suspend.start
 "

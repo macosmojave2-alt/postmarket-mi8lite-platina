@@ -1,0 +1,21 @@
+From: pmOS Mi8Lite <macosmojave2@gmail.com>
+Subject: [PATCH] drm/msm/dpu: sdm660: disable idle_pc to keep panel on
+
+With has_idle_pc=true the DPU collapses the INTF after the first frame when
+there are no new commits, dropping the panel to black (backlight on). On
+platina (Mi 8 Lite, video-mode TD4320) this leaves the screen black shortly
+after boot. Disable idle power collapse so the INTF keeps scanning out.
+
+Signed-off-by: pmOS Mi8Lite <macosmojave2@gmail.com>
+---
+--- a/drivers/gpu/drm/msm/disp/dpu1/catalog/dpu_3_2_sdm660.h	2026-06-18 09:10:09.528773239 -0500
++++ b/drivers/gpu/drm/msm/disp/dpu1/catalog/dpu_3_2_sdm660.h	2026-06-18 09:10:09.538695329 -0500
+@@ -11,7 +11,7 @@
+ 	.max_mixer_blendstages = 0x7,
+ 	.has_src_split = true,
+ 	.has_dim_layer = true,
+-	.has_idle_pc = true,
++	.has_idle_pc = false,
+ 	.has_3d_merge = true,
+ 	.max_linewidth = DEFAULT_DPU_OUTPUT_LINE_WIDTH,
+ 	.pixel_ram_size = DEFAULT_PIXEL_RAM_SIZE,

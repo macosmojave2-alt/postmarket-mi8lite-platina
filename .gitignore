@@ -3,6 +3,7 @@
 *.mbn
 *.mdt
 *.b[0-9]*
+*.elf
 board-2.bin
 firmware-5.bin
 *.tar.gz
@@ -27,3 +28,4 @@ squashfs-root/
 *.swp
 *~
 .DS_Store
+_backup-20260613-214516/

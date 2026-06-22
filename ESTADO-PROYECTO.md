@@ -26,10 +26,28 @@ mismo SoC). qcacld no entra en mainline → se porta pmOS sobre kernel Android 4
 | Paso | Estado |
 |------|--------|
 | 1. Crear paquete `linux-xiaomi-platina` (APKBUILD + config 4.19) | ✅ HECHO |
-| 2. Hacer que el kernel COMPILE | 🔄 EN CURSO (1 error resuelto, re-build pendiente) |
-| 3. device pkg downstream (separado del mainline) | ⬜ pendiente |
+| 2. Hacer que el kernel COMPILE | ✅ HECHO (apk r1, wlan.ko 12MB incluido) |
+| 3. device pkg downstream (separado del mainline) | 🔄 SIGUIENTE |
 | 4. Primer arranque hasta SSH (sin WiFi) | ⬜ pendiente |
 | 5. WiFi con qcacld (modprobe wlan, firmware, iw scan) | ⬜ pendiente |
+
+### Paso 2 completado (2026-06-11) — kernel + qcacld compilan
+APK: `linux-xiaomi-platina-4.19.325-r1.apk` (16.8 MB). kernel.release `4.19.325-cip132-st16`.
+- `vmlinuz` con DTB de platina ANEXADO (Image.gz-dtb, magic d00dfeed verificado).
+- **`wlan.ko` (qcacld) compilado**: ELF ARM aarch64, 12.3 MB, en
+  `/lib/modules/4.19.325-cip132-st16/kernel/drivers/staging/qcacld-3.0/wlan.ko`.
+- icnss/cnss builtin (=y). 14 módulos en total.
+Fixes aplicados en el APKBUILD/config (ver device/testing/linux-xiaomi-platina/):
+1. `REPLACE_GCCH=0` en prepare() (compiler-gcc.h choca en 4.19).
+2. `CONFIG_IKHEADERS` off (kheaders_data.tar.xz fallaba).
+3. patch 0001: `-I$(src)` para clk-debug (trace.h out-of-tree).
+4. cámara MSM off (`MSMB_CAMERA`/`MSM_CAMERA`, header faltante).
+5. IPA off (`CONFIG_IPA/IPA3/RMNET_IPA`, fortify __bad_copy_to).
+6. `CONFIG_FAULT_INJECTION` off (WRITE_ONCE macro).
+7. patch 0002: stubs DTS (pm660_coincell, sensor_information15).
+8. `CONFIG_ANDROID_VENDOR_HOOKS=y` (tracepoints android_vh_*).
+9. `CONFIG_MSM_AVTIMER` off + patch 0003 (guard msm_isp_set_avtimer_fptr sin cámara).
+10. `build()`+`package()`: `make modules` + `modules_install` (instalar wlan.ko).
 
 ## Recursos en disco (rutas absolutas)
 - **Kernel 4.19 (base de trabajo):**

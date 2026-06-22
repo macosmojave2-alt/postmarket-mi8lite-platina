@@ -1,18 +1,29 @@
-# Maintainer: macosmojave2 <macosmojave2@gmail.com>
+maintainer="Cesar Tamayo <macosmojave2@gmail.com>"
 pkgname=firmware-xiaomi-platina
-pkgver=1
-pkgrel=5
-pkgdesc="WiFi (WCN3990) + modem (MSS) firmware for Xiaomi Mi 8 Lite"
+pkgver=2
+pkgrel=0
+pkgdesc="Firmware files for Xiaomi Mi 8 Lite (display zap + WiFi + modem)"
 url="https://postmarketos.org"
 arch="aarch64"
 license="proprietary"
 options="!strip !check !archcheck !spdx !tracedeps pmb:cross-native"
 makedepends="qca-swiss-army-knife python3"
 
-# Firmware propietario extraído de la partición modem del propio dispositivo
-# (/vendor/firmware_mnt/image/). NO se versiona; el usuario lo provee localmente.
-# Coloca aquí: bdwlan.* y wlanmdsp.mbn extraídos del Mi 8 Lite.
+# Modelado segun firmware-xiaomi-lavender:
+# - a512_zap (zap shader del Adreno 512, necesario para el GPU/display) se toma
+#   del blob propietario del vendor publicado por TheMuppets (igual que lavender,
+#   pero del repo de platina). El paquete firmware-qcom-adreno-a530 BORRA el _zap
+#   por estar firmado, asi que debe venir de aqui.
+# - firmware-5.bin del WCN3990 se GENERA con ath10k-fwencoder (no es propietario).
+# - board-2.bin + wlanmdsp.mbn vienen de los bdwlan.* extraidos de la placa
+#   (calibracion WiFi especifica del dispositivo) -> tarball local.
+# - modem MSS (mba/modem.mdt/.bNN) extraido de la particion modem del dispositivo
+#   -> tarball local (necesario para WiFi/modem; lavender usa otro mecanismo).
+_muppets_commit="d3c57407b34d03ff3597f67129c2bb0bdcac3005"
+_muppets="proprietary_vendor_xiaomi_platina"
+
 source="
+	$_muppets-$_muppets_commit.tar.gz::https://github.com/TheMuppets/$_muppets/archive/$_muppets_commit.tar.gz
 	gen-board-2.py
 	$pkgname-bdwlan.tar.gz
 	$pkgname-modem.tar.gz
@@ -24,15 +35,13 @@ _fwdir="/lib/firmware/ath10k/WCN3990/hw1.0"
 build() {
 	cd "$srcdir"
 
-	# 1. firmware-5.bin genérico del WCN3990 (no es propietario; se genera)
+	# 1. firmware-5.bin generico del WCN3990 (no propietario; se genera)
 	ath10k-fwencoder --create \
 		--features=wowlan,no-nwifi-decap-4addr-padding,allows-mesh-bcast,mgmt-tx-by-ref,non-bmi,single-chan-info-per-channel \
 		--set-wmi-op-version=tlv --set-htt-op-version=tlv \
 		--set-fw-api=5
 
-	# 2. board-2.bin a partir de los bdwlan.* del dispositivo.
-	#    ath10k-bdencoder resuelve el campo "data" del JSON relativo a su CWD,
-	#    así que se ejecuta dentro del directorio que contiene los bdwlan.*
+	# 2. board-2.bin a partir de los bdwlan.* del dispositivo
 	python3 gen-board-2.py "$srcdir/bdwlan" "$srcdir/bdwlan/board-2.json"
 	cd "$srcdir/bdwlan"
 	ath10k-bdencoder -c board-2.json -o "$srcdir/board-2.bin"
@@ -40,17 +49,19 @@ build() {
 }
 
 package() {
-	# Firmware WiFi en la ruta que busca ath10k_snoc
+	# WiFi: firmware-5.bin (generado) + board-2.bin (de la placa)
 	install -Dm644 "$srcdir/firmware-5.bin" -t "$pkgdir/$_fwdir/"
 	install -Dm644 "$srcdir/board-2.bin"    -t "$pkgdir/$_fwdir/"
 
-	# Firmware del subsistema WiFi (modem) requerido por el WCN3990
+	# Firmware del subsistema WiFi requerido por el WCN3990
 	install -Dm644 "$srcdir/bdwlan/wlanmdsp.mbn" \
 		"$pkgdir/lib/firmware/postmarketos/wlanmdsp.mbn"
 
-	# Firmware del modem (MSS): mba.mbn + modem.mdt + segmentos modem.b*
-	# El devicetree apunta a postmarketos/{mba.mbn,modem.mdt}; el .mdt referencia
-	# los .bNN por nombre, así que deben quedar en el mismo directorio.
+	# Display: zap shader del GPU Adreno 512, desde TheMuppets (igual que lavender)
+	install -Dm644 "$srcdir/$_muppets-$_muppets_commit/proprietary/vendor/firmware/a512_zap.elf" \
+		"$pkgdir/lib/firmware/postmarketos/a512_zap.mbn"
+
+	# Modem (MSS): mba.mbn + modem.mdt + segmentos modem.bNN
 	install -dm755 "$pkgdir/lib/firmware/postmarketos"
 	install -Dm644 "$srcdir/modem/mba.mbn"   -t "$pkgdir/lib/firmware/postmarketos/"
 	install -Dm644 "$srcdir/modem/modem.mdt" -t "$pkgdir/lib/firmware/postmarketos/"
@@ -58,6 +69,7 @@ package() {
 }
 
 sha512sums="
+e2c597740a6a166d0e606e29e009a7617c18b5f58b69ab35be8088d3bd38b5483f1d6312efdb2229d7fa03168ca6c711d454198e12fadd2f2f27ec0f6c6336ff  proprietary_vendor_xiaomi_platina-d3c57407b34d03ff3597f67129c2bb0bdcac3005.tar.gz
 2ba14e95af7879cebc83940588467379fb16fbd9ef4229b993771385b5bedbff5d25b6e978c3ecb32d2adf7320b8779d27a6f06cef19726ab88ca486981d9d92  gen-board-2.py
 56afd564f4f3bd33777e3231ce7749059b5ec5fbe795b29554069a3239f0500f03e01c6f3338887b9ecfdb7c476f698ada1ae7b2649a29eae7fa3e2a1c95c1b1  firmware-xiaomi-platina-bdwlan.tar.gz
 b8cf61f17d74a4a579c0ae2bc51114c9de8d88a71e55acd44625d10728f4c1945c05d997879c244077e995d421541e3239d7b57d542a5799455bb6e913bde08b  firmware-xiaomi-platina-modem.tar.gz
