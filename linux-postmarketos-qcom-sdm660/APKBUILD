@@ -3,7 +3,7 @@ maintainer="Alexey Minnekhanov <alexeymin@minlexx.ru>"
 _flavor="postmarketos-qcom-sdm660"
 pkgname=linux-$_flavor
 pkgver=6.19.10
-pkgrel=12
+pkgrel=14
 pkgdesc="Close to mainline linux kernel for Qualcomm Snapdragon 660 SoC"
 arch="aarch64"
 url="https://kernel.org/"
@@ -88,7 +88,7 @@ package() {
 sha512sums="
 abf0ec97c2530ad3543a64019cefde3396c3361d7550513bf17948c6f4bf2621d88bb1947a519e8bddc97f1c6fdc7d12989cc8292a41805acac9f8f16f7a14df  linux-v6.19.10-sdm660.tar.gz
 461e2633d25411b7b868fde06ba165ca54726f46ce402729e848a95e52745a99fe5bccef26f4f957d69eed2d6cf38ffb5587b6eedfdb1fd9abfc4482135e7d71  config-postmarketos-qcom-sdm660.aarch64
-264da0a9bcdc690f123a176572604b982fd422f4f92f45ce367cb745aa315a41fbe07addea434ad31c21429eee45fc05bc7072b704fc53bf02b2a185b5bbde45  0001-platina-enable-display.patch
+839275e0223d6e2cfcff47c62b2d7c7d02efb5c25e3ba1f3bfabffaa34f8fd203f08523b2cd62e6c5923f8aaae4efe81def5f66dc99116ff55ac17146b1848a8  0001-platina-enable-display.patch
 83b9efa9b1a46499d1936f9e3f90b832458ace687a5ad3892ae1787a09997491efb9cc1bb0db44007adda97900ae2e3ce1b7dafa28ecb4cd84a95ade8667f05b  0002-panel-simple-td4320.patch
 f8763a58e2bf0b86857a7a31e8be5b7247e92a331bfce5974196c5d087ca59c2bb4a5332cf3ddb46f87b854067d281a0c738c6e79f7b07dee4cfe8d17f383588  0003-dpu-sdm660-disable-idle-pc.patch
 "
